@@ -53,26 +53,52 @@ app.put("/api/courses/:id", (req, res) => {
   //Look for the specified course
   const course = courses.find((c) => c.id === parseInt(req.params.id));
 
-  if (!course)
+  if (!course) {
     // 404 - Object not found
     res
       .status(404)
       .send(
         `404 - the course with the given id: ${req.params.id} was not found!`
       );
+    return;
+  }
 
   // const result = validateCourse(req.body);
 
   const { error } = validateCourse(req.body); // result.error
 
-  if (error) {
-    //400 Bad request
-    res.status(400).send(error.message);
-    return;
-  }
+  if (error) return res.status(400).send(error.message);
 
   // update course after req validation
   course.name = req.body.name;
+
+  // return the updated course
+  res.send(course);
+});
+
+app.delete("/api/courses/:id", (req, res) => {
+  //Look for the specified course
+  const course = courses.find((c) => c.id === parseInt(req.params.id));
+
+  if (!course)
+    return res
+      .status(404)
+      .send(
+        `404 - the course with the given id: ${req.params.id} was not found!`
+      );
+
+  //Validate request
+
+  // const result = validateCourse(req.body);
+
+  const { error } = validateCourse(req.body); // result.error
+
+  if (error) return res.status(400).send(error.message);
+
+  // Delete the course
+
+  const index = courses.indexOf(course);
+  courses.splice(index, 1); // remove 1 object from index
 
   // return the updated course
   res.send(course);
